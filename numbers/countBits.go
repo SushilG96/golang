@@ -45,3 +45,6 @@ func countBits(num int) []int {
     return result
 }
 */
+func countBitss(num int)[]int{
+    fm
+}

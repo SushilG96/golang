@@ -2,7 +2,7 @@
 
 Return the minimum element of this array.
 
- 
+
 
 Example 1:
 
