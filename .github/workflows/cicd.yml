@@ -1,0 +1,56 @@
+name: TestGoTools
+
+on:
+  push:
+    branches: [ '*' ]
+  pull_request:
+    branches: [ '*' ]
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        go: ["1.13", "1.14", "1.15"]
+
+    steps:
+    - uses: actions/setup-go@v2
+      with:
+        go-version: ${{ matrix.go }}
+
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Check gofmt
+      if: ${{ always() }}
+      run: |
+        output=$(gofmt -d -s -e -l .)
+        if test -z "$output"; then
+          echo "All files are already gofmt"
+          exit 0;
+        else
+          echo "$output"
+          exit 1;
+        fi
+    - name: Check golint
+      if: ${{ always() }}
+      run: |
+        go get -u golang.org/x/lint/golint
+        output=$(golint ./...)
+        if test -z "$output"; then
+          echo "All files are already golint"
+          exit 0;
+        else
+          echo "$output"
+          exit 1;
+        fi
+    - name: Check ineffassign
+      if: ${{ always() }}
+      run: |
+        export GO111MODULE=on
+        go get github.com/gordonklaus/ineffassign@cba2d2a
+        ineffassign ./*
